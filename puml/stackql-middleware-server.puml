@@ -1,0 +1,40 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define FONTAWESOME5 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome
+
+!include FONTAWESOME5/users.puml
+!include FONTAWESOME5/code.puml
+!include FONTAWESOME5/cloud.puml
+!include FONTAWESOME/gear.puml
+
+!define Rel_NoRank(e_from,e_to, e_label=" ") Rel_(e_from,e_to, e_label, "-[norank]->")
+
+title StackQL Middleware Server
+
+Person(users, "Users", $sprite="users")
+
+System_Boundary(middleware, "stackql Middleware") {
+    Container(restApi, "stackql API", "Deno Oak", $sprite="code")
+    Container(stackQLServer, "stackql server", "stackql srv", $sprite="gear")
+
+}
+
+System(apiProvider, "API Provider\n(REST)", $sprite="cloud")
+System(graphqlProvider, "API Provider\n(GraphQL)", $sprite="cloud")
+
+Lay_R(users, restApi)
+Lay_R(restApi, stackQLServer)
+Lay_R(stackQLServer, apiProvider)
+Lay_D(graphqlProvider, apiProvider)
+
+Rel_R(users, restApi, "POST request", "body: StackQL query")
+Rel_L(restApi, users, " ")
+Rel_R(restApi, stackQLServer, "PG wire protocol")
+Rel_L(stackQLServer, restApi, " ")
+Rel_R(stackQLServer, apiProvider, " ")
+Rel_L(apiProvider, stackQLServer, " ")
+Rel_NoRank(graphqlProvider, stackQLServer, " ")
+Rel_NoRank(stackQLServer, graphqlProvider, " ")
+
+@enduml
