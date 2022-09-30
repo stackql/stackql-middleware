@@ -143,3 +143,11 @@ Here is a quick start guide to get you up and running with the StackQL middlewar
 ## Generating a Provider
 
 Providers for any API backend can be generated using StackQL tools, including [stackql/openapi-doc-util](https://github.com/stackql/openapi-doc-util).
+
+
+## Acknowledgements
+
+This project is made possible by the following open source projects:
+- [StackQL](https://github.com/stackql/stackql)
+- [Deno Oak](https://deno.land/x/oak@v11.1.0)
+- [Deno Postgres Driver](https://github.com/denodrivers/postgres)

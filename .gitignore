@@ -1,3 +1,7 @@
+src/.stackql
+src/bin/*
+src/creds/*
+
 # Logs
 logs
 *.log
