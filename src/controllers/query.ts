@@ -30,7 +30,7 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
     }
 
     // is the query valid?
-    if(!inputData.query.startsWith("SELECT") && !inputData.query.startsWith("SHOW") && !inputData.query.startsWith("DESCRIBE")){
+    if(!inputData.query.toLowerCase().startsWith("select") && !inputData.query.startsWith("SHOW") && !inputData.query.startsWith("DESCRIBE")){
         respStatus = 405;
         queryOrError = "Method Not Allowed - methods other than SELECT, SHOW, DESCRIBE are not supported in middleware server mode";
     }
@@ -60,33 +60,13 @@ export const runQuery = async (ctx: Context) => {
         return;
     }
 
+    const showMetadata = (await bodyObj).showMetadata || false;
+    const iqlQuery = (await bodyObj).queryOrError;
 
-    const reqBody = ctx.request.body();
-    let bodyData : any;
-
-    // parse request body
+    // run query
     try {
-        bodyData = await reqBody.value;
-      } catch(err) {
-        logger.error(err);
-        return;
-      }
-  
-      if (bodyData.query === undefined) {
-        console.log('query not found');
-        return;
-      } else if(!bodyData.query.startsWith("SELECT") && !bodyData.query.startsWith("SHOW") && !bodyData.query.startsWith("DESCRIBE")){
-        console.log('query not supported');
-        return;
-      }
-  
-      const showMetadata = bodyData.showMetadata || false;
-      
-      const iqlQuery = bodyData.query;
-
-    try {
-
         const pgresult = await stackql.query(iqlQuery);        
+
         const cols : string[] = [];
         for (const column of pgresult.columns) {
             cols.push(column.name);
