@@ -1,6 +1,6 @@
 import * as logger from "./../shared/logger.ts";
 import { Context } from "./../types/context.ts";
-import { stackql } from "../db/db.ts";
+import * as stackql from "../db/db.ts";
 
 async function parseReqBody(body: any): Promise<{ queryOrError: string; showMetadata: boolean; respStatus: number; }> {
     let inputData : any;
@@ -30,15 +30,20 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
     }
 
     // is the query valid?
-    if(!inputData.query.toLowerCase().startsWith("select") && !inputData.query.startsWith("SHOW") && !inputData.query.startsWith("DESCRIBE")){
+    if(!inputData.query.toLowerCase().startsWith("select")){
         respStatus = 405;
-        queryOrError = "Method Not Allowed - methods other than SELECT, SHOW, DESCRIBE are not supported in middleware server mode";
+        queryOrError = "Method Not Allowed - methods other than SELECT are not supported in middleware server mode";
     }
+
+    // looks good, return the query
+    queryOrError = inputData.query;
+    showMetadata = inputData.showMetadata;
 
     return { queryOrError: queryOrError, respStatus: respStatus, showMetadata: showMetadata };
 }
 
 async function parseIqlResults(iqlResult: any): Promise< any[] > {
+    
     const cols : string[] = [];
     for (const column of iqlResult.columns) {
         cols.push(column.name);
@@ -70,17 +75,17 @@ export const runQuery = async (ctx: Context) => {
     }
 
     // parse body
-    const bodyObj = parseReqBody(await ctx.request.body());
+    const bodyObj = await parseReqBody(await ctx.request.body());
 
-    if((await bodyObj).respStatus != 200){
+    if(bodyObj.respStatus != 200){
         // something went wrong, get out
-        ctx.response.status = (await bodyObj).respStatus;
-        ctx.response.body = { error: (await bodyObj).queryOrError };
+        ctx.response.status = bodyObj.respStatus;
+        ctx.response.body = { error: bodyObj.queryOrError };
         return;
     }
 
-    const showMetadata = (await bodyObj).showMetadata || false;
-    const iqlQuery = (await bodyObj).queryOrError;
+    const showMetadata = bodyObj.showMetadata || false;
+    const iqlQuery = bodyObj.queryOrError;
 
     // run query
     try {
@@ -101,21 +106,21 @@ export const runQuery = async (ctx: Context) => {
             metadata.request['query'] = iqlQuery;
         }
 
-        // get results
-        const iqlResult = await stackql.query(iqlQuery);        
+        // connect, run query and get results
+        const stackqlConn = await stackql.connect();
+        const iqlResult = await stackqlConn.query(iqlQuery);        
 
         // parse results
-        const data = parseIqlResults(iqlResult);
+        const data = await parseIqlResults(iqlResult);
 
         if (showMetadata){
-            metadata.result['rowCount'] = (await data).length;
+            metadata.result['rowCount'] = data.length;
             metadata.operation['status'] = iqlResult.status;
             metadata.operation['endTime'] = new Date().toISOString();
             metadata.operation['duration'] = `${performance.now() - t0} ms`;
         }
 
         // prep resp
-    
         ctx.response.status = 200;
         ctx.response.type = "application/json";
         
@@ -123,11 +128,11 @@ export const runQuery = async (ctx: Context) => {
             data: data,
             metadata : showMetadata ? metadata : null
         }
-      
+
         ctx.response.body = `${JSON.stringify(respData)}\n`;
 
-        stackql.end();
-        stackql.destroy();        
+        stackqlConn.end();
+        stackqlConn.destroy();        
 
         return;
     } catch (error) {
