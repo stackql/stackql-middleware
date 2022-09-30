@@ -38,6 +38,25 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
     return { queryOrError: queryOrError, respStatus: respStatus, showMetadata: showMetadata };
 }
 
+async function parseIqlResults(iqlResult: any): Promise< any[] > {
+    const cols : string[] = [];
+    for (const column of iqlResult.columns) {
+        cols.push(column.name);
+    }
+    
+    const rows : any[] = [];
+    for (const sub of iqlResult.results) {
+        for (const row of sub.rows) {
+        const rowobj : any = {};
+        for (let i = 0; i < row.length; i++) {
+            rowobj[cols[i]] = row[i];
+        }
+        rows.push(rowobj);
+        }
+    }
+    return rows;
+}
+
 /**
  * return results from query
  */
@@ -65,22 +84,58 @@ export const runQuery = async (ctx: Context) => {
 
     // run query
     try {
-        const pgresult = await stackql.query(iqlQuery);        
 
-        const cols : string[] = [];
-        for (const column of pgresult.columns) {
-            cols.push(column.name);
+        // init metadata
+
+        // get operation start time
+        const t0 = performance.now();
+
+        let metadata = {
+            operation: {},
+            result: {},
+            request: {},
+        };
+
+        if (showMetadata){
+            metadata.operation['startTime'] = new Date().toISOString();;
+            metadata.request['query'] = iqlQuery;
         }
-        logger.info(JSON.stringify(cols));
 
-        // resp['body'] = await stackql.query(query);
-        // resp['status'] = 200;
-        // console.log(resp);
-        // return resp;
+        // get results
+        const iqlResult = await stackql.query(iqlQuery);        
+
+        // parse results
+        const data = parseIqlResults(iqlResult);
+
+        if (showMetadata){
+            metadata.result['rowCount'] = (await data).length;
+            metadata.operation['status'] = iqlResult.status;
+            metadata.operation['endTime'] = new Date().toISOString();
+            metadata.operation['duration'] = `${performance.now() - t0} ms`;
+        }
+
+        // prep resp
+    
+        ctx.response.status = 200;
+        ctx.response.type = "application/json";
+        
+        let respData = {
+            data: data,
+            metadata : showMetadata ? metadata : null
+        }
+      
+        ctx.response.body = `${JSON.stringify(respData)}\n`;
+
+        stackql.end();
+        stackql.destroy();        
+
         return;
     } catch (error) {
-        console.log(error);
+        ctx.response.status = 400;
+        const errResp = {
+            error: error.message.replace(/\n/g, ""),
+        };
+        ctx.response.body = `${JSON.stringify(errResp)}\n`;
         return;
-        // resp = error;
     }
 };
