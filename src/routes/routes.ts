@@ -2,7 +2,7 @@ import { Router } from "https://deno.land/x/oak/mod.ts";
 
 import * as miscRoutes from "./misc.routes.ts";
 import * as queryRoutes from "./query.routes.ts";
-// import * as metaRoutes from "./meta.routes.ts";
+import * as metaRoutes from "./meta.routes.ts";
 
 const router: Router = new Router();
 
@@ -12,15 +12,11 @@ router
 router
   .post("/stackql", ...queryRoutes.runQuery);
 
-// router
-//   .get("/providers", ...metaRoutes.getProviders)
-//   .get("/providers/:providerName", ...metaRoutes.getProviderByName)
-//   .get("/providers/:providerName/services", ...metaRoutes.getServices)
-//   .get("/providers/:providerName/services/:serviceName", ...metaRoutes.getServiceByName)
-//   .get("/providers/:providerName/services/:serviceName/resources", ...metaRoutes.getResources)
-//   .get("/providers/:providerName/services/:serviceName/resources", ...metaRoutes.getResources)
-//   .get("/providers/:providerName/services/:serviceName/resources/:resourceName", ...metaRoutes.getResourceByName)
-//   .get("/providers/:providerName/services/:serviceName/resources/:resourceName/fields", ...metaRoutes.getResourceFields)
-//   .get("/providers/:providerName/services/:serviceName/resources/:resourceName/methods", ...metaRoutes.getResourceMethods);
+router
+  .get("/providers", ...metaRoutes.getProviders)
+  .get("/providers/:providerName/services", ...metaRoutes.getServices)
+  .get("/providers/:providerName/services/:serviceName/resources", ...metaRoutes.getResources)
+  .get("/providers/:providerName/services/:serviceName/resources/:resourceName", ...metaRoutes.getResourceFields)
+  .get("/providers/:providerName/services/:serviceName/resources/:resourceName/methods", ...metaRoutes.getResourceMethods);
 
 export { router };

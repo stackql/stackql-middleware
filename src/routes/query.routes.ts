@@ -8,9 +8,7 @@ import * as queryController from "./../controllers/query.ts";
 const runQuery = [
     // userGuard(UserRole.ADMIN),
     async (ctx: Context) => {
-        const queryResp = await queryController.runQuery(ctx);
-        //ctx.response.body = await queryResp.body.query.value;
-        //ctx.response.status = queryResp.status;
+        await queryController.runQuery(ctx);
     },
 ];
 
