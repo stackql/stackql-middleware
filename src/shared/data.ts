@@ -2,6 +2,16 @@ import { generateTypes } from "https://deno.land/x/dts/mod.ts";
 // import * as logger from "./../shared/logger.ts";
 import * as stackql from "../db/db.ts";
 
+function reType(input: any): any {
+    try {
+        // its an object
+        return JSON.parse(input);
+    } catch (error) {
+        // its a primitive
+        return input;
+    }
+}
+
 async function parseIqlResults(iqlResult: any, allRows: boolean): Promise< any[] > {
     
     const cols : string[] = [];
@@ -14,7 +24,7 @@ async function parseIqlResults(iqlResult: any, allRows: boolean): Promise< any[]
         for (const row of sub.rows) {
             const rowobj : any = {};
             for (let i = 0; i < row.length; i++) {
-                rowobj[cols[i]] = row[i];
+                rowobj[cols[i]] = reType(row[i]);
             }
             rows.push(rowobj);
             if (!allRows) {
