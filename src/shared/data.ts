@@ -1,3 +1,4 @@
+import { generateTypes } from "https://deno.land/x/dts/mod.ts";
 // import * as logger from "./../shared/logger.ts";
 import * as stackql from "../db/db.ts";
 
@@ -24,7 +25,7 @@ async function parseIqlResults(iqlResult: any, allRows: boolean): Promise< any[]
     return rows;
 }
 
-async function getData(iqlQuery: string, showMetadata: boolean, dts: boolean): Promise< { respStatus: number; respType: string; respBody: string; } > {
+async function getData(iqlQuery: string, showMetadata: boolean): Promise< { respStatus: number; respType: string; respBody: string; } > {
     
     // run query
     try {
@@ -88,12 +89,13 @@ async function getTypes(iqlQuery: string): Promise< { respStatus: number; respTy
         // parse results
         const data = await parseIqlResults(iqlResult, false);
 
-        // TODO get types here
+        // get types
+        const result = await generateTypes(data[0]);
 
         stackqlConn.end();
         stackqlConn.destroy();        
 
-        return { respStatus: 200, respType: 'application/text', respBody: `types here` };
+        return { respStatus: 200, respType: 'application/text', respBody: result };
     } catch (error) {
         const errResp = {
             error: error.message.replace(/\n/g, ""),
