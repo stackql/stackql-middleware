@@ -1,5 +1,16 @@
+import { generateTypes } from "https://deno.land/x/dts/mod.ts";
 // import * as logger from "./../shared/logger.ts";
 import * as stackql from "../db/db.ts";
+
+function reType(input: any): any {
+    try {
+        // its an object
+        return JSON.parse(input);
+    } catch (error) {
+        // its a primitive
+        return input;
+    }
+}
 
 async function parseIqlResults(iqlResult: any, allRows: boolean): Promise< any[] > {
     
@@ -13,7 +24,7 @@ async function parseIqlResults(iqlResult: any, allRows: boolean): Promise< any[]
         for (const row of sub.rows) {
             const rowobj : any = {};
             for (let i = 0; i < row.length; i++) {
-                rowobj[cols[i]] = row[i];
+                rowobj[cols[i]] = reType(row[i]);
             }
             rows.push(rowobj);
             if (!allRows) {
@@ -24,7 +35,7 @@ async function parseIqlResults(iqlResult: any, allRows: boolean): Promise< any[]
     return rows;
 }
 
-async function getData(iqlQuery: string, showMetadata: boolean, dts: boolean): Promise< { respStatus: number; respType: string; respBody: string; } > {
+async function getData(iqlQuery: string, showMetadata: boolean): Promise< { respStatus: number; respType: string; respBody: string; } > {
     
     // run query
     try {
@@ -88,12 +99,13 @@ async function getTypes(iqlQuery: string): Promise< { respStatus: number; respTy
         // parse results
         const data = await parseIqlResults(iqlResult, false);
 
-        // TODO get types here
+        // get types
+        const result = await generateTypes(data[0]);
 
         stackqlConn.end();
         stackqlConn.destroy();        
 
-        return { respStatus: 200, respType: 'application/text', respBody: `types here` };
+        return { respStatus: 200, respType: 'application/text', respBody: result };
     } catch (error) {
         const errResp = {
             error: error.message.replace(/\n/g, ""),

@@ -1,8 +1,17 @@
 // import * as logger from "./../shared/logger.ts";
 import { Context } from "./../types/context.ts";
 import { getQueryParams } from "./../shared/params.ts";
-import { getData } from "../shared/data.ts";
+import { 
+    getData,
+    getTypes,
+ } from "../shared/data.ts";
 
+export interface RespData {
+    respStatus: number;
+    respType: string;
+    respBody: string;
+}
+  
 async function parseReqBody(body: any): Promise<{ queryOrError: string; showMetadata: boolean; respStatus: number; }> {
     let inputData : any;
     let respStatus = 200;
@@ -51,19 +60,11 @@ export const runQuery = async (ctx: Context) => {
         return;
     }
 
-    let showMetadata = false;
-
     // parse query params
     const queryParams = await getQueryParams(ctx);
 
     // parse body
-    const bodyObj = await parseReqBody(await ctx.request.body());
-
-    if (queryParams.showMetadata || bodyObj.showMetadata) {
-        showMetadata = true;
-    }
-
-    const dts = queryParams.dts || false;
+    const bodyObj = await parseReqBody(await ctx.request.body());    
 
     if(bodyObj.respStatus != 200){
         // something went wrong, get out
@@ -72,9 +73,32 @@ export const runQuery = async (ctx: Context) => {
         return;
     }
 
+    // get types?
+    const dts = queryParams.dts || false;
+
+    // show metadata? (ignored if dts is specified)  
+    let showMetadata = false;
+
+    if (queryParams.showMetadata || bodyObj.showMetadata) {
+        showMetadata = true;
+    }
+
     const iqlQuery = bodyObj.queryOrError;
 
-    const respData = await getData(iqlQuery, showMetadata, dts);
+    let respData: RespData = {
+        respStatus: 500,
+        respType: 'application/text',
+        respBody: 'Something went wrong',
+    };
+
+    if(dts){
+        // get types
+        respData = await getTypes(iqlQuery);
+    } else {
+        // get data
+        respData = await getData(iqlQuery, showMetadata);
+    }
+
     ctx.response.status = respData.respStatus;
     ctx.response.type = respData.respType;
     ctx.response.body = respData.respBody;

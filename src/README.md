@@ -1,8 +1,13 @@
 ## 1. generate keys
 
 ```
+<<<<<<< HEAD
 openssl req -x509 -keyout creds/server_key.pem -out creds/server_cert.pem -config openssl.cnf -days 365
 openssl req -x509 -keyout creds/client_key.pem -out creds/client_cert.pem -config openssl.cnf -days 365
+=======
+openssl req -x509 -keyout creds/server_key.pem -out creds/server_cert.pem -config creds/openssl.cnf -days 365
+openssl req -x509 -keyout creds/client_key.pem -out creds/client_cert.pem -config creds/openssl.cnf -days 365
+>>>>>>> b33bfc86db72cc9e74809e45f13f755d97dac1bc
 chmod 400 creds/client_key.pem
 ```
 
