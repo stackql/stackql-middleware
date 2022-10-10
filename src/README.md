@@ -53,6 +53,7 @@ export AUTH='{ "github": { "type": "basic", "credentialsenvvar": "GITHUB_CREDS" 
 ## 4. start middleware server
 change directory into ./src
 ```
+#deno run --allow-env --allow-net  --allow-read --unsafely-ignore-certificate-errors=localhost app.ts
 deno run --allow-env --allow-net  --allow-read app.ts
 ```
 
