@@ -17,16 +17,14 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
     let respStatus = 200;
     let queryOrError = "";
     let showMetadata = false;
-
     // try to parse the request body
     try {
-        inputData = await body.value;
+        inputData = JSON.parse(await body.value);
     } catch(err) {
         respStatus = 400;
         queryOrError = "Bad Request";
         return { queryOrError: queryOrError, respStatus: respStatus, showMetadata: showMetadata };
     }
-
     // post body is not json
     if(typeof inputData != "object") {
         respStatus = 400;
@@ -34,13 +32,12 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
     }
 
     // does a query field exist?
-    if (inputData.query === undefined) {
+    else if (inputData.query === undefined) {
         respStatus = 400;
         queryOrError = "Malformed Request - no query field";
     }
-
     // is the query valid?
-    if(!inputData.query.toLowerCase().startsWith("select")){
+    else if(!inputData.query.toLowerCase().startsWith("select")){
         respStatus = 405;
         queryOrError = "Method Not Allowed - methods other than SELECT are not supported in middleware server mode";
     }
@@ -48,7 +45,6 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
     // looks good, return the query
     queryOrError = inputData.query;
     showMetadata = inputData.showMetadata;
-
     return { queryOrError: queryOrError, respStatus: respStatus, showMetadata: showMetadata };
 }
 
