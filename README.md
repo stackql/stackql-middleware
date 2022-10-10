@@ -43,8 +43,10 @@ Results can be operated on using SQL functions and operators (including grouping
 
 
 <center>
-<img src="https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/stackql/stackql-middleware/main/puml/stackql-middleware-server.puml" alt="StackQL Middleware" width="90%"/>
+<img src="https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/stackql/stackql-middleware/main/puml/stackql-middleware-context.puml" alt="StackQL Middleware Context" width="90%"/>
 </center>
+
+Detailed design documentation can be found [here](docs/detailed-design.md).  
 
 ## Example Usage
 
