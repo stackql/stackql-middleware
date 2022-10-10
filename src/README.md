@@ -41,6 +41,7 @@ bin/stackql srv --auth="${AUTH}" \
 ## 4. start middleware server
 
 ```
+#deno run --allow-env --allow-net  --allow-read --unsafely-ignore-certificate-errors=localhost app.ts
 deno run --allow-env --allow-net  --allow-read app.ts
 ```
 
