@@ -18,6 +18,7 @@ export PGSSLSRVKEY=creds/server_key.pem
 export CLIENT_CERT=$(base64 -w 0 creds/client_cert.pem)
 export PGSSLMODE=allow
 ```
+
 For MacOS
 ```
 export CLIENT_CERT=$(base64 -b 0 creds/client_cert.pem)
@@ -54,7 +55,7 @@ stackql srv --auth=$AUTH\
 ```
 ## 4. start middleware server
 ```
-#deno run --allow-env --allow-net  --allow-read --unsafely-ignore-certificate-errors=localhost app.ts
+# deno run --allow-env --allow-net  --allow-read --unsafely-ignore-certificate-errors=localhost app.ts
 deno run --allow-env --allow-net  --allow-read app.ts
 ```
 

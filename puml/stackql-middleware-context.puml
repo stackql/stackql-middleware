@@ -10,7 +10,7 @@
 
 !define Rel_NoRank(e_from,e_to, e_label=" ") Rel_(e_from,e_to, e_label, "-[norank]->")
 
-title StackQL Middleware Server
+title StackQL Middleware Context Diagram
 
 Person(users, "Users", $sprite="users")
 
