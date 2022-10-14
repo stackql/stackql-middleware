@@ -20,8 +20,10 @@ services:
     ports:
       - 3000:3000
   runner:
-    image: stackql/stackql
-    # build: .
+    build:
+      context: .
+      cache_from:
+        - stackql/stackql
     # volumes:
     #   - ./vol/srv/credentials:/srv:ro
     # environment:
@@ -33,6 +35,7 @@ services:
     #command: [ "stackql", "--pgsrv.port=5444", "srv" ]    
     expose:
       - 5466
+    working_dir: /home/stackql
     command:
       - /bin/sh
       - -c
