@@ -13,7 +13,7 @@ services:
     environment:
       DB_HOST: 'runner'
       DB_PORT: 5444
-      DB_DEBUG: false
+      DB_DEBUG: 'false'
     ports:
       - 8080:8080 
   # runner:
