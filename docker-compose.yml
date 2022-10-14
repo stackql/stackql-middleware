@@ -20,8 +20,8 @@ services:
     ports:
       - 3000:3000
   runner:
-    # image: stackql/stackql
-    build: .
+    image: stackql/stackql
+    # build: .
     # volumes:
     #   - ./vol/srv/credentials:/srv:ro
     # environment:
@@ -31,12 +31,14 @@ services:
     # depends_on:
     #   - credentialsgen
     #command: [ "stackql", "--pgsrv.port=5444", "srv" ]    
+    expose:
+      - 5466
     command:
       - /bin/sh
       - -c
       - |
         stackql --version && \
-        stackql --pgsrv.loglevel=DEBUG srv      
+        stackql --loglevel=DEBUG srv
   api:
     build: src/
     # volumes:
