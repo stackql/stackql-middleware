@@ -3,7 +3,7 @@ import { pgconnect } from 'https://raw.githubusercontent.com/kagis/pgwire/main/m
 const env = Deno.env.toObject()
 const DB_HOST = env.DB_HOST || 'localhost'
 const DB_PORT = env.DB_PORT || 5444
-const DB_DEBUG = env.DB_DEBUG || true
+const DB_DEBUG = env.DB_DEBUG || false
 
 // const sslrootcert = await Deno.readTextFile('./creds/server_cert.pem');
 // const key = await Deno.readTextFile('./creds/client_key.pem');
@@ -28,7 +28,7 @@ export const connect = async () => {
         return conn;
 
     } catch (error) {
-        console.log(`Failed to connect to stackql server`);
+        console.log(`Failed to connect to stackql server at ${DB_HOST}:${DB_PORT}`);
         throw error;
     }
 }

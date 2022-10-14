@@ -1,5 +1,16 @@
 version: "3.9"
 services:
+  # credentialsgen:
+  #   image: alpine/openssl
+  #   volumes:
+  #     - ./vol/srv/credentials:/srv:rw
+  #   command: 
+  #     - bash
+  #     - -c
+  #     - |
+  #       wget https://raw.githubusercontent.com/stackql/stackql/main/test/server/mtls/openssl.cnf /srv/openssl.cnf && \
+  #       openssl req -x509 -keyout /srv/pg_server_key.pem -out /srv/pg_server_cert.pem  -config /srv/openssl.cnf -days 365  && \
+  #       openssl req -x509 -keyout /srv/pg_client_key.pem -out  /srv/pg_client_cert.pem  -config /srv/openssl.cnf -days 365
   playground:
     image: stackql/stackql-playground:latest
     environment:
@@ -8,19 +19,35 @@ services:
       MIDDLEWARE_PORT: '8080'
     ports:
       - 3000:3000
+  runner:
+    # image: stackql/stackql
+    build: .
+    # volumes:
+    #   - ./vol/srv/credentials:/srv:ro
+    # environment:
+    #   PGSSLSRVKEY: 'true'
+    #   PGSSLROOTCERT: 'true'
+    #   CLIENT_CERT: 'true'
+    # depends_on:
+    #   - credentialsgen
+    #command: [ "stackql", "--pgsrv.port=5444", "srv" ]    
+    command:
+      - /bin/sh
+      - -c
+      - |
+        stackql --version && \
+        stackql --pgsrv.loglevel=DEBUG srv      
   api:
     build: src/
+    # volumes:
+    #   - ./vol/srv/credentials:/srv:ro
     environment:
       DB_HOST: 'runner'
-      DB_PORT: 5444
+      DB_PORT: 5466
       DB_DEBUG: 'false'
     ports:
       - 8080:8080 
-  # runner:
-  #   build: .
-  #   environment:
-  #     PGSSLSRVKEY: 'true'
-  #     PGSSLROOTCERT: 'true'
-  #     CLIENT_CERT: 'true'
+    # depends_on:
+    #   - runner      
   cache:
     image: redis:alpine
