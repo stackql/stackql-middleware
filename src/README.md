@@ -25,9 +25,9 @@ export CLIENT_CERT=$(base64 -b 0 creds/client_cert.pem)
 ## 3a. start stackql sever with no auth
 
 ```
-bin/stackql srv \
+stackql srv \
 --pgsrv.address=0.0.0.0 \
---pgsrv.port=$PGPORT \
+--pgsrv.port=5444 \
 --pgsrv.tls='{ "keyFilePath": "'${PGSSLSRVKEY}'", "certFilePath": "'${PGSSLROOTCERT}'", "clientCAs": [ "'${CLIENT_CERT}'" ] }'
 ```
 
@@ -53,4 +53,3 @@ change directory into `./src`
 # deno run --allow-env --allow-net  --allow-read --unsafely-ignore-certificate-errors=localhost app.ts
 deno run --allow-env --allow-net  --allow-read app.ts
 ```
-

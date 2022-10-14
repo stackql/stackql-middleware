@@ -1,1 +1,11 @@
 registry list aws;
+show services in github like 'repo%';
+registry list ;
+registry pull github v0.3.6;
+show services in github like 'repo%';
+show reosurces in github.repos;
+show resources in github.repos;
+show resources in github.repos like 'repo%';
+describe github.repos.repos;
+show methods in github.repos.repos;
+select id, name from github.repos.repos where org = 'stackql';

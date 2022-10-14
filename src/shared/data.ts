@@ -1,6 +1,30 @@
 import { generateTypes } from "https://deno.land/x/dts/mod.ts";
+import { Client } from "https://deno.land/x/postgres@v0.16.1/mod.ts";
 // import * as logger from "./../shared/logger.ts";
-import * as stackql from "../db/db.ts";
+
+/*
+* get stackql srv env vars and initiate connection
+*/
+
+const env = Deno.env.toObject()
+const DB_HOST = env.DB_HOST || 'localhost'
+const DB_PORT = parseInt(env.DB_PORT) || 5444
+
+const client = new Client({
+    applicationName: 'stackql',
+    hostname: DB_HOST,
+    port: DB_PORT,
+    database: 'stackql',
+    user: 'stackql',
+});
+
+try {
+    console.log(`connecting to stackql server : ${DB_HOST}:${DB_PORT}`);
+    await client.connect();
+} catch (error) {
+    console.log(`Error connecting to stackql server ${DB_HOST}:${DB_PORT} : ${error.message}`);
+    throw error;
+}
 
 function reType(input: any): any {
     try {
@@ -10,29 +34,6 @@ function reType(input: any): any {
         // its a primitive
         return input;
     }
-}
-
-async function parseIqlResults(iqlResult: any, allRows: boolean): Promise< any[] > {
-    
-    const cols : string[] = [];
-    for (const column of iqlResult.columns) {
-        cols.push(column.name);
-    }
-    
-    const rows : any[] = [];
-    for (const sub of iqlResult.results) {
-        for (const row of sub.rows) {
-            const rowobj : any = {};
-            for (let i = 0; i < row.length; i++) {
-                rowobj[cols[i]] = reType(row[i]);
-            }
-            rows.push(rowobj);
-            if (!allRows) {
-                break;
-            }
-        }
-    }
-    return rows;
 }
 
 async function getData(iqlQuery: string, showMetadata: boolean): Promise< { respStatus: number; respType: string; respBody: string; } > {
@@ -57,28 +58,22 @@ async function getData(iqlQuery: string, showMetadata: boolean): Promise< { resp
         }
 
         // connect, run query and get results
-        const stackqlConn = await stackql.connect();
-        const iqlResult = await stackqlConn.query(iqlQuery);        
-
-        // parse results
-        const data = await parseIqlResults(iqlResult, true);
+        const data = await client.queryObject(iqlQuery);
 
         if (showMetadata){
-            metadata.result['rowCount'] = data.length;
-            metadata.operation['status'] = iqlResult.status;
+            metadata.result['rowCount'] = data.rows.length;
+            metadata.operation['status'] = 'OK';
             metadata.operation['endTime'] = new Date().toISOString();
             metadata.operation['duration'] = `${performance.now() - t0} ms`;
         }
         
         let respData = {
-            data: data,
+            data: data.rows,
             metadata : showMetadata ? metadata : null
         }
 
-        stackqlConn.end();
-        stackqlConn.destroy();        
-
         return { respStatus: 200, respType: 'application/json', respBody: `${JSON.stringify(respData)}\n` };
+
     } catch (error) {
         const errResp = {
             error: error.message.replace(/\n/g, ""),
@@ -93,19 +88,13 @@ async function getTypes(iqlQuery: string): Promise< { respStatus: number; respTy
     try {
 
         // connect, run query and get results
-        const stackqlConn = await stackql.connect();
-        const iqlResult = await stackqlConn.query(iqlQuery);        
-
-        // parse results
-        const data = await parseIqlResults(iqlResult, false);
+        const data = await client.queryObject(iqlQuery);
 
         // get types
-        const result = await generateTypes(data[0]);
-
-        stackqlConn.end();
-        stackqlConn.destroy();        
+        const result = await generateTypes(data.rows[0]);
 
         return { respStatus: 200, respType: 'application/text', respBody: result };
+
     } catch (error) {
         const errResp = {
             error: error.message.replace(/\n/g, ""),

@@ -35,12 +35,14 @@ services:
     #   - credentialsgen
     expose:
       - 5444
+    environment:
+      - GITHUB_CREDS=${GITHUB_CREDS}
     command:
       - /bin/sh
       - -c
       - |
         stackql --version && \
-        stackql --pgsrv.port=5444 srv      
+        stackql --auth="${AUTH_STR}" --pgsrv.port=5444 srv      
   api:
     build: src/
     # volumes:
