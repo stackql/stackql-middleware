@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  playground:
+    image: stackql/stackql-playground:latest
+    environment:
+      MIDDLEWARE_SCHEME: 'http'
+      MIDDLEWARE_HOST: 'api'
+      MIDDLEWARE_PORT: '8080'
+    ports:
+      - 3000:3000
+  api:
+    build: src/
+    environment:
+      DB_HOST: 'runner'
+      DB_PORT: 5444
+      DB_DEBUG: false
+    ports:
+      - 8080:8080 
+  # runner:
+  #   build: .
+  #   environment:
+  #     PGSSLSRVKEY: 'true'
+  #     PGSSLROOTCERT: 'true'
+  #     CLIENT_CERT: 'true'
+  cache:
+    image: redis:alpine
