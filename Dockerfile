@@ -1,8 +1,10 @@
 FROM stackql/stackql:latest
 EXPOSE 5444
-WORKDIR /app
+WORKDIR /home/stackql
 RUN adduser --system --uid 1001 stackql
 RUN addgroup --system --gid 1001 stackql
+RUN chown stackql:stackql /home/stackql
+RUN chown stackql:stackql /srv
 USER stackql
 RUN stackql exec 'registry pull aws v0.1.3'
 RUN stackql exec 'registry pull azure v0.3.0'

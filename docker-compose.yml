@@ -20,8 +20,11 @@ services:
     ports:
       - 3000:3000
   runner:
-    # image: stackql/stackql
-    build: .
+    build:
+      context: .
+      cache_from:
+        - stackql/stackql
+    working_dir: /home/stackql 
     # volumes:
     #   - ./vol/srv/credentials:/srv:ro
     # environment:
@@ -30,20 +33,21 @@ services:
     #   CLIENT_CERT: 'true'
     # depends_on:
     #   - credentialsgen
-    #command: [ "stackql", "--pgsrv.port=5444", "srv" ]    
+    expose:
+      - 5444
     command:
       - /bin/sh
       - -c
       - |
         stackql --version && \
-        stackql --pgsrv.loglevel=DEBUG srv      
+        stackql --pgsrv.port=5444 srv      
   api:
     build: src/
     # volumes:
     #   - ./vol/srv/credentials:/srv:ro
     environment:
       DB_HOST: 'runner'
-      DB_PORT: 5466
+      DB_PORT: 5444
       DB_DEBUG: 'false'
     ports:
       - 8080:8080 
