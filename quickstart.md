@@ -26,13 +26,19 @@ Using this quickstart example you can connect to and query any of the following 
 
 ## Steps
 
+This quick start uses [docker compose v2](https://docs.docker.com/compose/).  
+
 1. __Populate Environment Variables for Provider Authentication__
 
 something
 
 2. __Start Environment__
 
-something
+Run the following command in the same environment you used in Step 1 to populate yor environment variables:  
+
+```bash
+docker compose up --build
+```
 
 3. __Use the Playground__
 
@@ -44,8 +50,12 @@ something
 
 5. __Stop the Environment__
 
-something
+Use `ctrl-c` to stop the environment.  
 
 6. __Remove Containers__
 
-something
+Run the following command to remove the containers created in Step 2:  
+
+```bash
+docker compose down
+```
