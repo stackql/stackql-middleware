@@ -3,7 +3,7 @@
 Use the [docker-compose.yml](docker-compose.yml) file included with this repository to get up and running quickly with the following architecture:  
 
 <center>
-<img src="https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/stackql/stackql-middleware/main/puml/stackql-docker-compose.puml" alt="StackQL Middleware Docker Compose Environment" width="50%"/>
+<img src="https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/stackql/stackql-middleware/main/puml/stackql-docker-compose.puml" alt="StackQL Middleware Docker Compose Environment" width="80%"/>
 </center>
 
 The quickstart includes the following components:  
