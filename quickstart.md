@@ -10,7 +10,7 @@ The quickstart includes the following components:
 
 - [StackQL Server](https://github.com/stackql/stackql)
 - [StackQL Playground](https://github.com/stackql/stackql-playground)
-- [StackQL Middleware Server](README.md)
+- [StackQL Middleware Server](./README.md)
 
 ## Providers
 
