@@ -48,11 +48,11 @@ Enter a StackQL query in the __Query__ pane, then..
 
 Use the __*Run Query*__ button to run the query and see the results in the __Results__ pane; and/or  
 
-[![StackQL Playground Query](playground-query.png)](playground-query.png)
+[![StackQL Playground Query](images/playground-query.png)](images/playground-query.png)
 
 Use the __*Get Types*__ button to get the TypeScript types for the result set.  
 
-[![StackQL Playground Types](playground-types.png)](playground-types.png)
+[![StackQL Playground Types](images/playground-types.png)](images/playground-types.png)
 
 Use the query and the types in your application.  
 
