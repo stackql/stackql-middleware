@@ -140,7 +140,7 @@ If there are errors in the execution of a query, a response similar to the follo
 
 ## Quickstart
 
-Here is a quick start guide to get you up and running with the StackQL middleware server.  
+Here is a [quick start guide](quickstart.md) to get you up and running with the StackQL middleware server.  
 
 ## Generating a Provider
 
