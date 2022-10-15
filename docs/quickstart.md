@@ -36,10 +36,14 @@ Populate the following environment variables where required (for a provider for 
 
 Then export a variable named `AUTH_STR` which will be passed to the stackql server.  A complete example using GitHub credentials is shown here:  
 
+__MacOS/Linux__
+
 ```bash
 export GITHUB_CREDS=$(echo -n 'yourusername:ghp_YOURPERSONALACCESSTOKEN' | base64)
 export AUTH_STR='{ "github": { "type": "basic", "credentialsenvvar": "GITHUB_CREDS" }}'
 ```
+
+__Windows/PowerShell__
 
 ```powershell
 $Env:GITHUB_CREDS = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("yourusername:ghp_YOURPERSONALACCESSTOKEN"))
