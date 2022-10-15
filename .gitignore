@@ -4,6 +4,7 @@ src/creds/*
 .stackql/*
 creds/*
 stackql
+*.tmp
 
 # Logs
 logs
