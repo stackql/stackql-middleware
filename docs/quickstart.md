@@ -30,7 +30,21 @@ This quick start uses [docker compose v2](https://docs.docker.com/compose/).
 
 1. __Populate Environment Variables for Provider Authentication__
 
-something
+Populate the following environment variables where required (for a provider for which you have credentials and want to query):  
+
+- `GITHUB_CREDS` (base64 encoded value of the GitHub username and Personal Acces Token)
+
+Then export a variable named `AUTH_STR` which will be passed to the stackql server.  A complete example using GitHub credentials is shown here:  
+
+```bash
+export GITHUB_CREDS=$(echo -n 'yourusername:ghp_YOURPERSONALACCESSTOKEN' | base64)
+export AUTH_STR='{ "github": { "type": "basic", "credentialsenvvar": "GITHUB_CREDS" }}'
+```
+
+```powershell
+$Env:GITHUB_CREDS = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("yourusername:ghp_YOURPERSONALACCESSTOKEN"))
+$Env:AUTH_STR = "{ 'github': { 'type': 'basic', 'credentialsenvvar': 'GITHUB_CREDS' } }"
+```
 
 2. __Start Environment__
 
@@ -58,7 +72,23 @@ Use the query and the types in your application.
 
 4. __Use the Middleware API__
 
-something
+The middleware API is accessible through port `8080`, you can use Postman, `curl`, or any other client library such as `node-fetch` or `axios` to run StackQL queries against this endpoint and return results as `application/json` responses.  
+
+Meta routes such as:  
+
+- `/providers`
+- `/providers/{providerName}/services`
+- `/providers/{providerName}/services/{serviceName}/resources`
+- `/providers/{providerName}/services/{serviceName}/resources/{resourceName}`
+- `/providers/{providerName}/services/{serviceName}/resources/{resourceName}/methods`
+
+are accessible using `GET` requests as shown here:  
+
+[![StackQL Meta Queries](images/stackql-postman-meta-queries.png)](images/stackql-postman-meta-queries.png)
+
+You can run a StackQL (`SELECT`) query against a `provider`, `service`, `resource` using a `POST` request as shown here:  
+
+[![StackQL Queries](images/stackql-postman-queries.png)](images/stackql-postman-queries.png)
 
 5. __Stop the Environment__
 

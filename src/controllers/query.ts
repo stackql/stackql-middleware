@@ -17,9 +17,15 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
     let respStatus = 200;
     let queryOrError = "";
     let showMetadata = false;
+
     // try to parse the request body
     try {
-        inputData = JSON.parse(await body.value);
+        const bodyData = await body.value;
+        if (typeof bodyData === "object") {
+            inputData = bodyData;
+        } else {
+            inputData = JSON.parse(await bodyData);
+        }
     } catch(err) {
         respStatus = 400;
         queryOrError = "Bad Request";
