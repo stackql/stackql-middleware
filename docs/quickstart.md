@@ -33,6 +33,10 @@ This quick start uses [docker compose v2](https://docs.docker.com/compose/).
 Populate the following environment variables where required (for a provider for which you have credentials and want to query):  
 
 - `GITHUB_CREDS` (base64 encoded value of the GitHub username and Personal Acces Token)
+- `AZ_ACCESS_TOKEN` (Azure access token)
+- `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (AWS API credentials)
+- `OKTA_SECRET_KEY` (Okta API key)
+- `NETLIFY_TOKEN` (Netlify API key)
 
 Then export a variable named `AUTH_STR` which will be passed to the stackql server.  A complete example using GitHub credentials is shown here:  
 
