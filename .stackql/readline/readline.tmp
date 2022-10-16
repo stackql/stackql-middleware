@@ -9,3 +9,4 @@ show resources in github.repos like 'repo%';
 describe github.repos.repos;
 show methods in github.repos.repos;
 select id, name from github.repos.repos where org = 'stackql';
+describe github.repos.repos;

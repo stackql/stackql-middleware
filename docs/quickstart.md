@@ -54,6 +54,13 @@ $Env:GITHUB_CREDS = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF
 $Env:AUTH_STR = "{ 'github': { 'type': 'basic', 'credentialsenvvar': 'GITHUB_CREDS' } }"
 ```
 
+> for additional provider support, add their authentication objects to the `auth` struct as shown below, for more information about authentication, check the documentation for the respective provider, see [here](https://registry.stackql.io/)
+
+```bash
+export GITHUB_CREDS=$(echo -n 'yourusername:ghp_YOURPERSONALACCESSTOKEN' | base64)
+export AUTH_STR='{ "github": { "type": "basic", "credentialsenvvar": "GITHUB_CREDS" }, "aws": { "type": "aws_signing_v4", "credentialsenvvar": "AWS_SECRET_ACCESS_KEY", "keyIDenvvar": "AWS_ACCESS_KEY_ID" }}'
+```
+
 2. __Start Environment__
 
 Run the following command in the same environment you used in Step 1 to populate yor environment variables:  
