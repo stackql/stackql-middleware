@@ -36,7 +36,13 @@ services:
     expose:
       - 5444
     environment:
+      - AUTH_STR=${AUTH_STR}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AZ_ACCESS_TOKEN=${AZ_ACCESS_TOKEN}
       - GITHUB_CREDS=${GITHUB_CREDS}
+      - OKTA_SECRET_KEY=${OKTA_SECRET_KEY}
+      - NETLIFY_TOKEN=${NETLIFY_TOKEN}
     command:
       - /bin/sh
       - -c

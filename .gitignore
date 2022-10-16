@@ -5,6 +5,9 @@ src/creds/*
 creds/*
 stackql
 *.tmp
+.demo-creds.sh
+.demo-creds.ps1
+.demo-queries.sql
 
 # Logs
 logs

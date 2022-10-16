@@ -43,9 +43,9 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
         queryOrError = "Malformed Request - no query field";
     }
     // is the query valid?
-    else if(!inputData.query.toLowerCase().startsWith("select")){
+    else if(!inputData.query.toLowerCase().startsWith("select") && !inputData.query.toLowerCase().startsWith("show") && !inputData.query.toLowerCase().startsWith("describe")){
         respStatus = 405;
-        queryOrError = "Method Not Allowed - methods other than SELECT are not supported in middleware server mode";
+        queryOrError = "Method Not Allowed - methods other than SELECT, SHOW and DESCRIBE are not supported in middleware server mode";
     }
 
     // looks good, return the query
