@@ -10,3 +10,5 @@ describe github.repos.repos;
 show methods in github.repos.repos;
 select id, name from github.repos.repos where org = 'stackql';
 describe github.repos.repos;
+select c.id, m.login, c.type, c.url from github.repos.contributors c inner join github.orgs.members m where m.org = 'stackql' and c.repo = 'stackql-playground' AND c.owner = 'stackql';
+select c.id, m.login, c.type, c.url from github.repos.contributors c inner join github.orgs.members m on m.id = c.id where m.org = 'stackql' and c.repo = 'stackql-playground' AND c.owner = 'stackql';
