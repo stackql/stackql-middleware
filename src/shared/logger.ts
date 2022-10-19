@@ -1,29 +1,29 @@
-import {
-    bold,
-    cyan,
-    green,
-    yellow,
-  } from "https://deno.land/std@0.152.0/fmt/colors.ts";
+import * as log from "https://deno.land/std@0.160.0/log/mod.ts";
 
-function getDateTime(){
-    const now = new Date();
-    return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+const env = Deno.env.toObject()
+const LOGLEVEL = env.LOGLEVEL || 'INFO'
+
+console.log(`LOGLEVEL: ${LOGLEVEL}`);
+
+await log.setup({
+    handlers: {
+        console: new log.handlers.ConsoleHandler(LOGLEVEL),
+    },
+    loggers: {
+        default: {
+            level: LOGLEVEL,
+            handlers: ["console"],
+        },
+    }  
+});
+
+const logger = log.getLogger();
+
+const formatDetailedLogMessage = (msg: string, fileName: string, functionName: string): string => {
+    return `${msg} (${fileName}, ${functionName})`;
 }
 
-const info = (message: string) => {
-    console.log(`${bold(green(getDateTime()))} ${bold(green('INFO'))} ${bold(message)}`);
-};
-
-const error = (message: string) => {
-    console.log(`${bold(cyan(getDateTime()))} ${bold(cyan('ERROR'))} ${bold(message)}`);
-};
-
-const debug = (message: string) => {
-    console.log(`${bold(yellow(getDateTime()))} ${bold(yellow('DEBUG'))} ${bold(message)}`);
-};
-
 export {
-    info,
-    error,
-    debug,
+    logger,
+    formatDetailedLogMessage,
 }

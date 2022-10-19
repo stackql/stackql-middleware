@@ -5,6 +5,12 @@ import {
     getData,
     getTypes,
  } from "../shared/data.ts";
+ import { 
+    logger,
+    formatDetailedLogMessage, 
+} from "./../shared/logger.ts";
+
+const fileName = 'controllers/query.ts';
 
 export interface RespData {
     respStatus: number;
@@ -59,6 +65,8 @@ async function parseReqBody(body: any): Promise<{ queryOrError: string; showMeta
  */
 export const runQuery = async (ctx: Context) => {
 
+    const functionName = 'runQuery';
+
     // exit if body is empty
     if (!ctx.request.hasBody) {
         ctx.response.status = 400;
@@ -67,10 +75,11 @@ export const runQuery = async (ctx: Context) => {
     }
 
     // parse query params
-    const queryParams = await getQueryParams(ctx);
+    const queryParams = await getQueryParams(ctx, fileName, functionName);
 
     // parse body
-    const bodyObj = await parseReqBody(await ctx.request.body());    
+    const bodyObj = await parseReqBody(await ctx.request.body());
+    logger.debug(formatDetailedLogMessage(`bodyObj: ${JSON.stringify(bodyObj)}`, fileName, functionName));
 
     if(bodyObj.respStatus != 200){
         // something went wrong, get out
@@ -78,9 +87,6 @@ export const runQuery = async (ctx: Context) => {
         ctx.response.body = { error: bodyObj.queryOrError };
         return;
     }
-
-    // get types?
-    const dts = queryParams.dts || false;
 
     // show metadata? (ignored if dts is specified)  
     let showMetadata = false;
@@ -97,14 +103,14 @@ export const runQuery = async (ctx: Context) => {
         respBody: 'Something went wrong',
     };
 
-    if(dts){
+    if(queryParams.dts){
         // get types
         respData = await getTypes(iqlQuery);
     } else {
         // get data
         respData = await getData(iqlQuery, showMetadata);
     }
-
+    logger.debug(formatDetailedLogMessage(`respData: ${JSON.stringify(respData)}`, fileName, functionName));
     ctx.response.status = respData.respStatus;
     ctx.response.type = respData.respType;
     ctx.response.body = respData.respBody;
