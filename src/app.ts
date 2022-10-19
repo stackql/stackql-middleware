@@ -3,14 +3,17 @@ import { oakCors } from "https://deno.land/x/cors/mod.ts";
 import { router } from "./routes/routes.ts";
 import _404 from "./controllers/404.ts";
 import { Context } from "./types/context.ts";
-import * as logger from "./shared/logger.ts";
+import { logger,
+         formatDetailedLogMessage, 
+} from "./shared/logger.ts";
 
 const env = Deno.env.toObject()
 const HOST = env.HOST || '0.0.0.0'
 const PORT = env.PORT || 8080
-const LOGLEVEL = env.LOGLEVEL || 'info'
 
 const app = new Application<Context>();
+
+const fileName = 'app.ts';
 
 app.use(oakCors());
 app.use(router.routes());
@@ -23,7 +26,7 @@ app.addEventListener("listen", ({ hostname, port, serverType }) => {
 
 app.addEventListener(
     "error",
-    (e) => logger.error(`Server error : ${e.message}`)
+    (e: any) => logger.error(formatDetailedLogMessage(`Server error : ${e.message}`, fileName, 'app.addEventListener')),
 );
 
 await app.listen({ hostname: HOST, port: PORT });

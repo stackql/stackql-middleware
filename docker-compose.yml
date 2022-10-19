@@ -57,6 +57,7 @@ services:
       DB_HOST: 'runner'
       DB_PORT: 5444
       DB_DEBUG: 'false'
+      LOGLEVEL: ${LOGLEVEL}
     ports:
       - 8080:8080 
     # depends_on:

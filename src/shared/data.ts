@@ -1,6 +1,11 @@
 import { generateTypes } from "https://deno.land/x/dts/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.16.1/mod.ts";
-// import * as logger from "./../shared/logger.ts";
+import { 
+    logger,
+    formatDetailedLogMessage, 
+} from "./logger.ts";
+
+const fileName = 'shared/data.ts';
 
 /*
 * get stackql srv env vars and initiate connection
@@ -38,6 +43,8 @@ function reType(input: any): any {
 
 async function getData(iqlQuery: string, showMetadata: boolean): Promise< { respStatus: number; respType: string; respBody: string; } > {
     
+    const functionName = 'getData';
+    
     // run query
     try {
 
@@ -72,9 +79,12 @@ async function getData(iqlQuery: string, showMetadata: boolean): Promise< { resp
             metadata : showMetadata ? metadata : null
         }
 
+        logger.debug(formatDetailedLogMessage(`respData: ${JSON.stringify(respData)}`, fileName, functionName));
+
         return { respStatus: 200, respType: 'application/json', respBody: `${JSON.stringify(respData)}\n` };
 
     } catch (error) {
+        logger.debug(formatDetailedLogMessage(`error: ${JSON.stringify(error)}`, fileName, functionName));
         const errResp = {
             error: error.message.replace(/\n/g, ""),
         };

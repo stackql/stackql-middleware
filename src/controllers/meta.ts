@@ -1,30 +1,35 @@
 // import * as logger from "./../shared/logger.ts";
 import { Context } from "./../types/context.ts";
 import { 
+    getPathParams,
     getQueryParams, 
     getQueryFilter 
 } from "./../shared/params.ts";
 import { getData } from "../shared/data.ts";
+import { 
+    logger,
+    formatDetailedLogMessage, 
+} from "./../shared/logger.ts";
+
+const fileName = 'controllers/meta.ts';
 
 /**
  * return all providers installed
  */
 const showProviders = async (ctx: Context) => {
 
+    const functionName = 'showProviders';
+
     // parse query params
-    const queryParams = await getQueryParams(ctx);
+    const queryParams = await getQueryParams(ctx, fileName, functionName);
 
-    // showMetadata
-    const showMetadata = queryParams.showMetadata || false;
-
-    // dts
-    const dts = queryParams.dts || false;
-
-    // run query
+    // set query
     const iqlQuery = `SHOW PROVIDERS`;
+    logger.debug(formatDetailedLogMessage(`iqlQuery: ${iqlQuery}`, fileName, functionName));
 
     // return results
-    const respData = await getData(iqlQuery, showMetadata, dts);
+    const respData = await getData(iqlQuery, queryParams.showMetadata);
+    logger.debug(formatDetailedLogMessage(`respData: ${JSON.stringify(respData)}`, fileName, functionName));
     ctx.response.status = respData.respStatus;
     ctx.response.type = respData.respType;
     ctx.response.body = respData.respBody;
@@ -35,26 +40,26 @@ const showProviders = async (ctx: Context) => {
  */
 const showServices = async (ctx: Context) => {
 
+    const functionName = 'showServices';
+
     // get path params
-    const providerName = ctx.params.providerName;
+    const pathParams = await getPathParams(ctx, fileName, functionName);
+    const providerName = pathParams.providerName;
 
     // parse query params
-    const queryParams = await getQueryParams(ctx);
+    const queryParams = await getQueryParams(ctx, fileName, functionName);
 
     // filter param?
     const filterParam = await getQueryFilter(ctx);
-
-    // showMetadata
-    const showMetadata = queryParams.showMetadata || false;
-
-    // dts
-    const dts = queryParams.dts || false;
+    logger.debug(formatDetailedLogMessage(`filterParam: ${filterParam}`, fileName, functionName));
 
     // run query
     const iqlQuery = `SHOW EXTENDED SERVICES IN ${providerName}${filterParam}`;
+    logger.debug(formatDetailedLogMessage(`iqlQuery: ${iqlQuery}`, fileName, functionName));
 
     // return results
-    const respData = await getData(iqlQuery, showMetadata, dts);
+    const respData = await getData(iqlQuery, queryParams.showMetadata);
+    logger.debug(formatDetailedLogMessage(`respData: ${JSON.stringify(respData)}`, fileName, functionName));
     ctx.response.status = respData.respStatus;
     ctx.response.type = respData.respType;
     ctx.response.body = respData.respBody;
@@ -65,27 +70,26 @@ const showServices = async (ctx: Context) => {
  */
  const showResources = async (ctx: Context) => {
 
-    // get path params
-    const providerName = ctx.params.providerName;
-    const serviceName = ctx.params.serviceName;
+    const functionName = 'showResources';
 
+    // get path params
+    const pathParams = await getPathParams(ctx, fileName, functionName);
+    const providerName = pathParams.providerName;
+    const serviceName = pathParams.serviceName;
+    
     // parse query params
-    const queryParams = await getQueryParams(ctx);
+    const queryParams = await getQueryParams(ctx, fileName, functionName);
 
     // filter param?
     const filterParam = await getQueryFilter(ctx);
 
-    // showMetadata
-    const showMetadata = queryParams.showMetadata || false;
-
-    // dts
-    const dts = queryParams.dts || false;
-
     // run query
     const iqlQuery = `SHOW EXTENDED RESOURCES IN ${providerName}.${serviceName}${filterParam}`;
+    logger.debug(formatDetailedLogMessage(`iqlQuery: ${iqlQuery}`, fileName, functionName));
 
     // return results
-    const respData = await getData(iqlQuery, showMetadata, dts);
+    const respData = await getData(iqlQuery, queryParams.showMetadata);
+    logger.debug(formatDetailedLogMessage(`respData: ${JSON.stringify(respData)}`, fileName, functionName));
     ctx.response.status = respData.respStatus;
     ctx.response.type = respData.respType;
     ctx.response.body = respData.respBody;
@@ -96,25 +100,24 @@ const showServices = async (ctx: Context) => {
  */
  const describeResource = async (ctx: Context) => {
 
+    const functionName = 'describeResource';
+
     // get path params
-    const providerName = ctx.params.providerName;
-    const serviceName = ctx.params.serviceName;
-    const resourceName = ctx.params.resourceName;
+    const pathParams = await getPathParams(ctx, fileName, functionName);
+    const providerName = pathParams.providerName;
+    const serviceName = pathParams.serviceName;
+    const resourceName = pathParams.resourceName;
 
     // parse query params
-    const queryParams = await getQueryParams(ctx);
-
-    // showMetadata
-    const showMetadata = queryParams.showMetadata || false;
-
-    // dts
-    const dts = queryParams.dts || false;
+    const queryParams = await getQueryParams(ctx, fileName, functionName);
 
     // run query
     const iqlQuery = `DESCRIBE EXTENDED ${providerName}.${serviceName}.${resourceName}`;
+    logger.debug(formatDetailedLogMessage(`iqlQuery: ${iqlQuery}`, fileName, functionName));
 
     // return results
-    const respData = await getData(iqlQuery, showMetadata, dts);
+    const respData = await getData(iqlQuery, queryParams.showMetadata);
+    logger.debug(formatDetailedLogMessage(`respData: ${JSON.stringify(respData)}`, fileName, functionName));
     ctx.response.status = respData.respStatus;
     ctx.response.type = respData.respType;
     ctx.response.body = respData.respBody;
@@ -125,25 +128,24 @@ const showServices = async (ctx: Context) => {
  */
  const showMethods = async (ctx: Context) => {
 
+    const functionName = 'showMethods';
+
     // get path params
-    const providerName = ctx.params.providerName;
-    const serviceName = ctx.params.serviceName;
-    const resourceName = ctx.params.resourceName;
+    const pathParams = await getPathParams(ctx, fileName, functionName);
+    const providerName = pathParams.providerName;
+    const serviceName = pathParams.serviceName;
+    const resourceName = pathParams.resourceName;
 
     // parse query params
-    const queryParams = await getQueryParams(ctx);
-
-    // showMetadata
-    const showMetadata = queryParams.showMetadata || false;
-
-    // dts
-    const dts = queryParams.dts || false;
+    const queryParams = await getQueryParams(ctx, fileName, functionName);
 
     // run query
     const iqlQuery = `SHOW EXTENDED METHODS IN ${providerName}.${serviceName}.${resourceName}`;
+    logger.debug(formatDetailedLogMessage(`iqlQuery: ${iqlQuery}`, fileName, functionName));
 
     // return results
-    const respData = await getData(iqlQuery, showMetadata, dts);
+    const respData = await getData(iqlQuery, queryParams.showMetadata);
+    logger.debug(formatDetailedLogMessage(`respData: ${JSON.stringify(respData)}`, fileName, functionName));
     ctx.response.status = respData.respStatus;
     ctx.response.type = respData.respType;
     ctx.response.body = respData.respBody;
