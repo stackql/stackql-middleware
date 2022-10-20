@@ -99,9 +99,16 @@ async function getTypes(iqlQuery: string): Promise< { respStatus: number; respTy
 
         // connect, run query and get results
         const data = await client.queryObject(iqlQuery);
+        const firstRow = data.rows[0];
+
+        // parse each field
+        const castedFields = {};
+        Object.keys(firstRow).forEach(k => {
+            castedFields[k] = reType(firstRow[k]);
+        });
 
         // get types
-        const result = await generateTypes(data.rows[0]);
+        const result = await generateTypes(castedFields);
 
         return { respStatus: 200, respType: 'application/text', respBody: result };
 
