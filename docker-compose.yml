@@ -1,16 +1,4 @@
-version: "3.9"
 services:
-  # credentialsgen:
-  #   image: alpine/openssl
-  #   volumes:
-  #     - ./vol/srv/credentials:/srv:rw
-  #   command: 
-  #     - bash
-  #     - -c
-  #     - |
-  #       wget https://raw.githubusercontent.com/stackql/stackql/main/test/server/mtls/openssl.cnf /srv/openssl.cnf && \
-  #       openssl req -x509 -keyout /srv/pg_server_key.pem -out /srv/pg_server_cert.pem  -config /srv/openssl.cnf -days 365  && \
-  #       openssl req -x509 -keyout /srv/pg_client_key.pem -out  /srv/pg_client_cert.pem  -config /srv/openssl.cnf -days 365
   playground:
     image: stackql/stackql-playground:latest
     environment:
@@ -18,49 +6,40 @@ services:
       MIDDLEWARE_HOST: 'api'
       MIDDLEWARE_PORT: '8080'
     ports:
-      - 3000:3000
+      - "3000:3000"
+    depends_on:
+      - api
+
   runner:
     build:
       context: .
-      cache_from:
-        - stackql/stackql
-    working_dir: /home/stackql 
-    # volumes:
-    #   - ./vol/srv/credentials:/srv:ro
-    # environment:
-    #   PGSSLSRVKEY: 'true'
-    #   PGSSLROOTCERT: 'true'
-    #   CLIENT_CERT: 'true'
-    # depends_on:
-    #   - credentialsgen
+      dockerfile: runner.Dockerfile
+    working_dir: /home/stackql
     expose:
       - 5444
     environment:
-      - AUTH_STR=${AUTH_STR}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AZ_ACCESS_TOKEN=${AZ_ACCESS_TOKEN}
-      - GITHUB_CREDS=${GITHUB_CREDS}
-      - OKTA_SECRET_KEY=${OKTA_SECRET_KEY}
-      - NETLIFY_TOKEN=${NETLIFY_TOKEN}
-    command:
-      - /bin/sh
-      - -c
-      - |
-        stackql --version && \
-        stackql --auth="${AUTH_STR}" --pgsrv.port=5444 srv      
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - GITHUB_CREDS
+      - OKTA_SECRET_KEY
+      - NETLIFY_TOKEN
+    healthcheck:
+      test: ["CMD", "stackql", "--version"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    command: stackql --pgsrv.port=5444 srv
+
   api:
-    build: src/
-    # volumes:
-    #   - ./vol/srv/credentials:/srv:ro
+    build:
+      context: ./src
+      dockerfile: Dockerfile
     environment:
-      DB_HOST: 'runner'
+      DB_HOST: runner
       DB_PORT: 5444
-      DB_DEBUG: 'false'
-      LOGLEVEL: ${LOGLEVEL}
+      LOGLEVEL: ${LOGLEVEL:-INFO}
     ports:
-      - 8080:8080 
-    # depends_on:
-    #   - runner      
-  cache:
-    image: redis:alpine
+      - "8080:8080"
+    depends_on:
+      runner:
+        condition: service_healthy

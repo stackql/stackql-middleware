@@ -1,32 +1,47 @@
-import { Application } from "https://deno.land/x/oak/mod.ts";
-import { oakCors } from "https://deno.land/x/cors/mod.ts";
-import { router } from "./routes/routes.ts";
-import _404 from "./controllers/404.ts";
-import { Context } from "./types/context.ts";
-import { logger,
-         formatDetailedLogMessage, 
-} from "./shared/logger.ts";
-
-const env = Deno.env.toObject()
-const HOST = env.HOST || '0.0.0.0'
-const PORT = env.PORT || 8080
+// app.ts
+import { Application } from "./deps.ts";
+import { oakCors } from "./deps.ts";
+import { Context } from "./types/context.types.ts";
+import { config } from "./config/environment.ts";
+import { logger } from "./services/logger.service.ts";
+import { db } from "./services/database.service.ts";
+import { errorHandler } from "./middleware/error.middleware.ts";
+import { healthRouter } from "./routes/health.routes.ts";
+import { queryRouter } from "./routes/query.routes.ts";
+import { metaRouter } from "./routes/meta.routes.ts";
 
 const app = new Application<Context>();
 
-const fileName = 'app.ts';
-
-app.use(oakCors());
-app.use(router.routes());
-app.use(router.allowedMethods());
-app.use(_404);
-
-app.addEventListener("listen", ({ hostname, port, serverType }) => {
-    logger.info(`Server started on ${hostname}:${port} using ${serverType}`);
+// Debug logging middleware
+app.use(async (ctx, next) => {
+  logger.debug(`Request: ${ctx.request.method} ${ctx.request.url}`);
+  logger.debug('Headers:', ctx.request.headers);
+  const start = Date.now();
+  await next();
+  const ms = Date.now() - start;
+  logger.debug(`Response: ${ctx.response.status} in ${ms}ms`);
 });
 
-app.addEventListener(
-    "error",
-    (e: any) => logger.error(formatDetailedLogMessage(`Server error : ${e.message}`, fileName, 'app.addEventListener')),
-);
+app.use(oakCors());
+app.use(errorHandler);
 
-await app.listen({ hostname: HOST, port: PORT });
+app.use(healthRouter.routes());
+app.use(queryRouter.routes());
+app.use(metaRouter.routes());
+
+app.use(healthRouter.allowedMethods());
+app.use(queryRouter.allowedMethods());
+app.use(metaRouter.allowedMethods());
+
+app.addEventListener("error", (evt) => {
+  logger.error(`Uncaught error: ${evt.error}`);
+});
+
+logger.debug('Config:', config);
+await db.connect();
+logger.info(`Starting server on ${config.server.host}:${config.server.port}`);
+
+await app.listen({
+  port: config.server.port,
+  hostname: config.server.host,
+});

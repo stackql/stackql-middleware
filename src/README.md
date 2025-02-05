@@ -1,55 +1,77 @@
-## 1. generate keys
+# StackQL Middleware
 
-```
-openssl req -x509 -keyout creds/server_key.pem -out creds/server_cert.pem -config creds/openssl.cnf -days 365
-openssl req -x509 -keyout creds/client_key.pem -out creds/client_cert.pem -config creds/openssl.cnf -days 365
-```
+REST API middleware server that enables SQL-based queries against cloud provider APIs using [StackQL](https://github.com/stackql/stackql).
 
-## 2. set env vars
+## Features
 
-```
-export PGPORT=5444
-export PGSSLCERT=creds/client_cert.pem
-export PGSSLKEY=creds/client_key.pem
-export PGSSLROOTCERT=creds/server_cert.pem
-export PGSSLSRVKEY=creds/server_key.pem
-export CLIENT_CERT=$(base64 -w 0 creds/client_cert.pem)
-export PGSSLMODE=allow
-```
+- SQL query execution against cloud services
+- Provider/service/resource discovery
+- Query result type generation
+- Response metadata
+- CORS support
 
-For MacOS
-```
-export CLIENT_CERT=$(base64 -b 0 creds/client_cert.pem)
-```
+## Quick Start
 
-## 3a. start stackql sever with no auth
+```bash
+# Start dependencies
+docker compose up -d runner
 
-```
-stackql srv \
---pgsrv.address=0.0.0.0 \
---pgsrv.port=5444 \
---pgsrv.tls='{ "keyFilePath": "'${PGSSLSRVKEY}'", "certFilePath": "'${PGSSLROOTCERT}'", "clientCAs": [ "'${CLIENT_CERT}'" ] }'
+# Start server
+cd src
+deno run --allow-net --allow-env app.ts
 ```
 
-## 3b. start stackql server with auth
+## API Endpoints
 
-### Azure example
+### Query Execution
+```http
+POST /stackql
+Content-Type: application/json
 
+{
+  "query": "SELECT name, id FROM google.compute.instances",
+  "showMetadata": true
+}
 ```
-export AZ_ACCESS_TOKEN=$(az account get-access-token --query accessToken --output tsv | tr -d '\r')
-AUTH='{ "azure": { "type": "api_key", "valuePrefix": "Bearer ", "credentialsenvvar": "AZ_ACCESS_TOKEN" } }'
-bin/stackql srv --auth="${AUTH}" \
---pgsrv.address=0.0.0.0 \
---pgsrv.port=$PGPORT \
---pgsrv.tls='{ "keyFilePath": "'${PGSSLSRVKEY}'", "certFilePath": "'${PGSSLROOTCERT}'", "clientCAs": [ "'${CLIENT_CERT}'" ] }'
-```
-### GitHub
-export AUTH='{ "github": { "type": "basic", "credentialsenvvar": "GITHUB_CREDS" } }'
 
-## 4. start middleware server
-change directory into `./src`
+### Provider Discovery
+```http
+GET /providers
+GET /providers/{provider}/services
+GET /providers/{provider}/services/{service}/resources 
+GET /providers/{provider}/services/{service}/resources/{resource}
+GET /providers/{provider}/services/{service}/resources/{resource}/methods
+```
 
+## Development
+
+```bash
+# Install Deno
+curl -fsSL https://deno.land/x/install/install.sh | sh
+
+# Development with hot reload
+deno run --allow-net --allow-env --watch app.ts
 ```
-# deno run --allow-env --allow-net  --allow-read --unsafely-ignore-certificate-errors=localhost app.ts
-deno run --allow-env --allow-net  --allow-read app.ts
+
+## Docker
+
+```bash
+# Build and start all services
+docker compose up --build
 ```
+
+## Environment Variables
+
+- `HOST` - Server host (default: 0.0.0.0)
+- `PORT` - Server port (default: 8080)
+- `DB_HOST` - StackQL server host (default: localhost) 
+- `DB_PORT` - StackQL server port (default: 5444)
+- `LOGLEVEL` - Logging level (default: INFO)
+
+## Architecture
+
+- Oak-based HTTP server (Deno)
+- PostgreSQL wire protocol client for StackQL communication
+- Modular routing and controller structure
+- Centralized error handling
+- TypeScript throughout
