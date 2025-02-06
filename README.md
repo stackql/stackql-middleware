@@ -42,19 +42,17 @@ The StackQL middleware server enables clients to query api backends using a natu
 Results can be operated on using SQL functions and operators (including grouping, windowing, and aggregation functions) and then returned to the client as a JSON response.  The following architecture diagram illustrates the StackQL middleware server's components.
 
 ```mermaid
-C4Context
-   Person(user, "User or UserAgent")
-   Boundary(b0, "stackql Middleware") {
-       Container(api, "stackql API", "Deno Oak", "accepts http requests with stackql queries")
-       Container(runner, "stackql runner", "stackql srv", "runs stackql queries against providers")
-   }
-   System_Ext(cloudprovider, "Cloud or Data Provider", "cloud or data resources")
-   Rel(user, api, "submits stackql queries", "POST /stackql")
-   BiRel(api, runner, "via pgwire")
-   BiRel(runner, cloudprovider, "makes api calls", "HTTP/HTTPS")
-   UpdateRelStyle(api, runner, $offsetX="-20", $offsetY="-15")
-   UpdateRelStyle(runner, cloudprovider, $offsetX="10", $offsetY="-40")
-   UpdateRelStyle(user, api, $offsetX="0", $offsetY="-40")
+graph LR;
+   user["User or UserAgent"] -->|submits queries| api["stackql API (Deno Oak)"];
+   api --> |gets results| user 
+
+   subgraph middleware["stackql Middleware"]
+    direction TB
+    api <-.-> |via pgwire| runner["stackql runner (stackql srv)"];
+   end
+   
+   runner -->|API calls| cloudprovider["Cloud Provider"];
+   cloudprovider --> |data| runner
 ```   
 
 Detailed design documentation can be found [here](docs/detailed-design.md).  
