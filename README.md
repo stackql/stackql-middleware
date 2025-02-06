@@ -39,7 +39,7 @@ The StackQL middleware server is built on top of the [StackQL core](https://gith
 
 The StackQL middleware server enables clients to query api backends using a natural SQL language for providers installed with authentication configured in the StackQL server.  The StackQL server includes a front-end parser and query planner, which translates the SQL query into one or more REST and/or GraphQL requests and then executes the queries against the backends.  
 
-Results can be operated on using SQL functions and operators (including grouping, windowing, and aggregation functions) and then returned to the client as a JSON response.  The following architecture diagram illustrates the StackQL middleware server's components.  
+Results can be operated on using SQL functions and operators (including grouping, windowing, and aggregation functions) and then returned to the client as a JSON response.  The following architecture diagram illustrates the StackQL middleware server's components.
 
 ```mermaid
 C4Context
