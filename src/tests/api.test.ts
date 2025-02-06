@@ -69,6 +69,42 @@ Deno.test("API Integration Tests", async (t) => {
       assertEquals(response.status, 200);
       assertExists(data.data);
     });
+
+    await t.step("Query execution - DTS generation", async () => {
+      const { response, data } = await makeRequest(
+        "http://localhost:8080/stackql?dts=true", 
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: "DESCRIBE EXTENDED aws.ec2.instances"
+          })
+        }
+      );
+      assertEquals(response.status, 200);
+      assertEquals(response.headers.get("content-type"), "text/plain; charset=UTF-8");
+      assertExists(data.includes("declare module namespace"));
+      assertExists(data.includes("IRootObject"));
+      assertExists(data.includes("name: string"));
+    });
+ 
+    await t.step("Query execution - metadata disabled", async () => {
+      const { response, data } = await makeRequest(
+        "http://localhost:8080/stackql",
+        {
+          method: "POST", 
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: "SELECT * FROM github.repos.contributors WHERE repo = 'stackql' and owner = 'stackql'",
+            showMetadata: false
+          })
+        }
+      );
+      assertEquals(response.status, 200);
+      assertExists(data.data);
+      assertEquals(data.metadata, undefined);
+    });
+
   } finally {
     // Clean up all fetch requests
     controllers.forEach(controller => controller.abort());

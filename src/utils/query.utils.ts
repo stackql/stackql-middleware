@@ -1,5 +1,5 @@
 // utils/query.utils.ts
-const ALLOWED_QUERY_TYPES = ['select', 'show', 'describe'];
+const ALLOWED_QUERY_TYPES = ['select', 'show', 'describe', 'registry'];
 
 export function validateQuery(query: string): string | null {
  if (!query) {
@@ -8,7 +8,7 @@ export function validateQuery(query: string): string | null {
 
  const queryType = query.trim().toLowerCase().split(' ')[0];
  if (!ALLOWED_QUERY_TYPES.includes(queryType)) {
-   return `Query type '${queryType}' not allowed. Only SELECT, SHOW, and DESCRIBE are supported`;
+   return `Query type '${queryType}' not allowed. Only SELECT, SHOW, DESCRIBE and REGISTRY are supported`;
  }
 
  return null;
