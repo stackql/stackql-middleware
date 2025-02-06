@@ -11,6 +11,6 @@ export const config = {
       user: 'stackql',
     },
     logging: {
-      level: Deno.env.get('LOGLEVEL') || 'DEBUG'
+      level: Deno.env.get('LOGLEVEL') || 'INFO'
     }
   };

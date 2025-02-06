@@ -1,7 +1,7 @@
 src/.stackql
 src/bin/*
 src/creds/*
-.stackql/*
+.stackql
 creds/*
 stackql
 stackql.exe
@@ -9,6 +9,7 @@ stackql.exe
 .demo-creds.sh
 .demo-creds.ps1
 .demo-queries.sql
+.env
 
 # Logs
 logs

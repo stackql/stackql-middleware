@@ -57,12 +57,9 @@ flowchart TB;
    cloudprovider --> |data| runner
 ```   
 
-Detailed design documentation can be found [here](docs/detailed-design.md).  
-
 ## Example Usage
 
-
-## Request Structure
+### Request Structure
 
 StackQL queries are sent to the server using the `POST` method and the `application/json` content type.  The request body should contain a JSON object with the following properties:  
 
@@ -81,11 +78,25 @@ StackQL queries are sent to the server using the `POST` method and the `applicat
 
 `showMetadata` is an optional property that, if set to `true`, will cause the server to return metadata about the query execution.  This includes the query plan, the number of rows returned, and the time to execute the query.  The default value is `false`.  
 
-## Response Structure
+An example is shown here:
+
+```bash
+curl -X POST http://localhost:8080/stackql \
+     -H "Content-Type: application/json" \
+     -d '{
+           "query": "SELECT COUNT(*) FROM aws.ec2.instances_list_only WHERE region = '\''ap-southeast-2'\''",
+           "params": {
+             "region": "ap-southeast-2"
+           },
+           "showMetadata": true
+         }'
+```         
+
+### Response Structure
 
 Responses can include metadata and the results of a query or will return information about errors if they occur.  
 
-### Without Metadata
+#### Without Metadata
 
 If the `showMetadata` option is not set or set to `false`, the response will be a JSON array containing the query results.  The following example shows the response to a query that returns a single row with two columns:  
 
@@ -100,7 +111,7 @@ If the `showMetadata` option is not set or set to `false`, the response will be 
 }
 ```
 
-### With Metadata
+#### With Metadata
 
 If the query was submitted with the `showMetadata` option set, additional information about the request and response will be returned.  An example is shown here:  
 
@@ -132,7 +143,7 @@ If the query was submitted with the `showMetadata` option set, additional inform
 }
 ```
 
-### With Errors
+#### With Errors
 
 If there are errors in the execution of a query, a response similar to the following will be returned:  
 
@@ -155,12 +166,12 @@ Here is a [quick start guide](docs/quickstart.md) to get you up and running with
 
 ## Generating a Provider
 
-Providers for any API backend can be generated using StackQL tools, including [stackql/openapi-doc-util](https://github.com/stackql/openapi-doc-util).
+Providers for any API backend can be generated using StackQL tools, including [stackql/openapisaurus](https://github.com/stackql/openapisaurus).
 
 
 ## Acknowledgements
 
 This project is made possible by the following open source projects:
 - [StackQL](https://github.com/stackql/stackql)
-- [Deno Oak](https://deno.land/x/oak@v11.1.0)
+- [Oak Server](https://oakserver.org/)
 - [Deno Postgres Driver](https://github.com/denodrivers/postgres)

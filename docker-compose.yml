@@ -18,11 +18,23 @@ services:
     expose:
       - 5444
     environment:
+      - STACKQL_GITHUB_USERNAME
+      - STACKQL_GITHUB_PASSWORD
+      - AZURE_TENANT_ID
+      - AZURE_CLIENT_ID
+      - AZURE_CLIENT_SECRET
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
-      - GITHUB_CREDS
-      - OKTA_SECRET_KEY
-      - NETLIFY_TOKEN
+      - GOOGLE_CREDENTIALS
+      - DIGITALOCEAN_ACCESS_TOKEN
+      - LINODE_TOKEN
+      - DATABRICKS_ACCOUNT_ID
+      - DATABRICKS_CLIENT_ID
+      - DATABRICKS_CLIENT_SECRET
+      - CONFLUENT_CLOUD_API_KEY
+      - CONFLUENT_CLOUD_API_SECRET
+      - OKTA_API_TOKEN
+      - NETLIFY_AUTH_TOKEN
     healthcheck:
       test: ["CMD", "stackql", "--version"]
       interval: 10s
