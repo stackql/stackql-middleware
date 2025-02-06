@@ -41,8 +41,6 @@ The StackQL middleware server enables clients to query api backends using a natu
 
 Results can be operated on using SQL functions and operators (including grouping, windowing, and aggregation functions) and then returned to the client as a JSON response.  The following architecture diagram illustrates the StackQL middleware server's components.  
 
-### Context Diagram
-
 ```mermaid
 C4Context
    Person(user, "User or UserAgent")
