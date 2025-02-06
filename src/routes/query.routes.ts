@@ -1,22 +1,6 @@
-import { Context } from "./../types/context.ts";
-import * as queryController from "./../controllers/query.ts";
-import { 
-    logger,
-    formatDetailedLogMessage, 
-} from "./../shared/logger.ts";
+// routes/query.routes.ts
+import { Router } from "../deps.ts";
+import * as queryController from "../controllers/query.controller.ts";
 
-const fileName = 'routes/query.routes.ts';
-
-/**
- * run a stackql SELECT query
- * call by USER
- */
-const runQuery = [
-    // userGuard(UserRole.ADMIN),
-    async (ctx: Context) => {
-        logger.debug(formatDetailedLogMessage(`runQuery route invoked, context: ${JSON.stringify(ctx)}`, fileName, 'runQuery'));
-        await queryController.runQuery(ctx);
-    },
-];
-
-export { runQuery };
+export const queryRouter = new Router()
+  .post("/stackql", queryController.executeQuery);

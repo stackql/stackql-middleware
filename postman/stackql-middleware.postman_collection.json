@@ -1,0 +1,111 @@
+{
+    "info": {
+        "name": "StackQL Middleware",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{base_url}}/health"
+                }
+            }
+        },
+        {
+            "name": "Execute Query",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "{{base_url}}/stackql"
+                },
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"query\": \"SELECT name, region FROM aws.s3.buckets LIMIT 5\",\n  \"showMetadata\": true\n}"
+                }
+            }
+        },
+        {
+            "name": "List Providers",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{base_url}}/providers"
+                }
+            }
+        },
+        {
+            "name": "List AWS Services",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{base_url}}/providers/aws/services"
+                }
+            }
+        },
+        {
+            "name": "List S3 Resources",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{base_url}}/providers/aws/services/s3/resources"
+                }
+            }
+        },
+        {
+            "name": "S3 Bucket Resource Details",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{base_url}}/providers/aws/services/s3/resources/buckets"
+                }
+            }
+        },
+        {
+            "name": "S3 Bucket Methods",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "{{base_url}}/providers/aws/services/s3/resources/buckets/methods"
+                }
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080"
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": []
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "pm.test(\"Status code is 200\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test(\"Response is JSON\", function () {",
+                    "    pm.response.to.be.json;",
+                    "});"
+                ]
+            }
+        }
+    ]
+}

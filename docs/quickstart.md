@@ -1,12 +1,6 @@
 # StackQL Middleware Quickstart
 
-Use the [docker-compose.yml](../docker-compose.yml) file included with this repository to get up and running quickly with the following architecture:  
-
-<center>
-<img src="https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/stackql/stackql-middleware/main/puml/stackql-docker-compose.puml" alt="StackQL Middleware Docker Compose Environment" width="80%"/>
-</center>
-
-The quickstart includes the following components:  
+Use the [docker-compose.yml](../docker-compose.yml) file included with this repository which contains a quick start to get up and running quickly.  This includes the following components:  
 
 - [StackQL Server](https://github.com/stackql/stackql)
 - [StackQL Playground](https://github.com/stackql/stackql-playground)
@@ -30,36 +24,22 @@ This quick start uses [docker compose v2](https://docs.docker.com/compose/).
 
 1. __Populate Environment Variables for Provider Authentication__
 
-Populate the following environment variables where required (for a provider for which you have credentials and want to query):  
+(Optional) Populate the following environment variables where required (for a provider for which you have credentials and want to query):  
 
-- `GITHUB_CREDS` (base64 encoded value of the GitHub username and Personal Acces Token)
-- `AZ_ACCESS_TOKEN` (Azure access token)
+- `STACKQL_GITHUB_USERNAME` and `STACKQL_GITHUB_PASSWORD` (GitHub Username and Personal Access Token)
+- `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` (for Azure access)
 - `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` (AWS API credentials)
-- `OKTA_SECRET_KEY` (Okta API key)
-- `NETLIFY_TOKEN` (Netlify API key)
+- `GOOGLE_CREDENTIALS` (Google service account)
+- `DIGITALOCEAN_ACCESS_TOKEN`
+- `LINODE_TOKEN`
+- `DATABRICKS_ACCOUNT_ID`, `DATABRICKS_CLIENT_ID`, `DATABRICKS_CLIENT_SECRET` (for `databricks_account` or `databricks_workspace`)
+- `CONFLUENT_CLOUD_API_KEY`, `CONFLUENT_CLOUD_API_SECRET` (for Confluent cloud access)
+- `OKTA_API_TOKEN`
+- `NETLIFY_AUTH_TOKEN`
 
-Then export a variable named `AUTH_STR` which will be passed to the stackql server.  A complete example using GitHub credentials is shown here:  
+> for additional provider support, export their authentication environment variables and add them to the `environment` section of the `runner` in [docker-compose.yml](../docker-compose.yml), for more information about authentication, check the documentation for the respective provider, see [here](https://registry.stackql.io/)
 
-__MacOS/Linux__
-
-```bash
-export GITHUB_CREDS=$(echo -n 'yourusername:ghp_YOURPERSONALACCESSTOKEN' | base64)
-export AUTH_STR='{ "github": { "type": "basic", "credentialsenvvar": "GITHUB_CREDS" }}'
-```
-
-__Windows/PowerShell__
-
-```powershell
-$Env:GITHUB_CREDS = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("yourusername:ghp_YOURPERSONALACCESSTOKEN"))
-$Env:AUTH_STR = "{ 'github': { 'type': 'basic', 'credentialsenvvar': 'GITHUB_CREDS' } }"
-```
-
-> for additional provider support, add their authentication objects to the `auth` struct as shown below, for more information about authentication, check the documentation for the respective provider, see [here](https://registry.stackql.io/)
-
-```bash
-export GITHUB_CREDS=$(echo -n 'yourusername:ghp_YOURPERSONALACCESSTOKEN' | base64)
-export AUTH_STR='{ "github": { "type": "basic", "credentialsenvvar": "GITHUB_CREDS" }, "aws": { "type": "aws_signing_v4", "credentialsenvvar": "AWS_SECRET_ACCESS_KEY", "keyIDenvvar": "AWS_ACCESS_KEY_ID" }}'
-```
+> ℹ️ To bring your own custom provider, add the provider dirctory to the `.stackql/src` directory on the runner image, then export a variable named `AUTH_STR` and pass this to the the stackql server as an argument in the `runner` section of the `docker-compose.yml` (`stackql --auth="${AUTH_STR}" --pgsrv.port=5444 srv`).  The `AUTH_STR` should map to the authentication method and variable names in your custom `provider.yaml` definition, e.g. `'{"my_provider": { "type": "api_key", "credentialsenvvar": "MY_KEY_VAR" }}'`.
 
 2. __Start Environment__
 

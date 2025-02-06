@@ -39,19 +39,27 @@ The StackQL middleware server is built on top of the [StackQL core](https://gith
 
 The StackQL middleware server enables clients to query api backends using a natural SQL language for providers installed with authentication configured in the StackQL server.  The StackQL server includes a front-end parser and query planner, which translates the SQL query into one or more REST and/or GraphQL requests and then executes the queries against the backends.  
 
-Results can be operated on using SQL functions and operators (including grouping, windowing, and aggregation functions) and then returned to the client as a JSON response.  The following architecture diagram illustrates the StackQL middleware server's components.  
+Results can be operated on using SQL functions and operators (including grouping, windowing, and aggregation functions) and then returned to the client as a JSON response.  The following architecture diagram illustrates the StackQL middleware server's components.
 
+### Context Diagram
 
-<center>
-<img src="https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/stackql/stackql-middleware/main/puml/stackql-middleware-context.puml" alt="StackQL Middleware Context" width="90%"/>
-</center>
+```mermaid
+flowchart TB;
+   user["User or UserAgent"] -->|submits queries| api["stackql API (Deno Oak)"];
+   api --> |gets results| user 
 
-Detailed design documentation can be found [here](docs/detailed-design.md).  
+   subgraph middleware["stackql Middleware"]
+    direction TB
+    api <-.-> |via pgwire| runner["stackql runner (stackql srv)"];
+   end
+   
+   runner -->|API calls| cloudprovider["Cloud Provider"];
+   cloudprovider --> |data| runner
+```   
 
 ## Example Usage
 
-
-## Request Structure
+### Request Structure
 
 StackQL queries are sent to the server using the `POST` method and the `application/json` content type.  The request body should contain a JSON object with the following properties:  
 
@@ -70,11 +78,25 @@ StackQL queries are sent to the server using the `POST` method and the `applicat
 
 `showMetadata` is an optional property that, if set to `true`, will cause the server to return metadata about the query execution.  This includes the query plan, the number of rows returned, and the time to execute the query.  The default value is `false`.  
 
-## Response Structure
+An example is shown here:
+
+```bash
+curl -X POST http://localhost:8080/stackql \
+     -H "Content-Type: application/json" \
+     -d '{
+           "query": "SELECT COUNT(*) FROM aws.ec2.instances_list_only WHERE region = '\''ap-southeast-2'\''",
+           "params": {
+             "region": "ap-southeast-2"
+           },
+           "showMetadata": true
+         }'
+```         
+
+### Response Structure
 
 Responses can include metadata and the results of a query or will return information about errors if they occur.  
 
-### Without Metadata
+#### Without Metadata
 
 If the `showMetadata` option is not set or set to `false`, the response will be a JSON array containing the query results.  The following example shows the response to a query that returns a single row with two columns:  
 
@@ -89,7 +111,7 @@ If the `showMetadata` option is not set or set to `false`, the response will be 
 }
 ```
 
-### With Metadata
+#### With Metadata
 
 If the query was submitted with the `showMetadata` option set, additional information about the request and response will be returned.  An example is shown here:  
 
@@ -121,7 +143,7 @@ If the query was submitted with the `showMetadata` option set, additional inform
 }
 ```
 
-### With Errors
+#### With Errors
 
 If there are errors in the execution of a query, a response similar to the following will be returned:  
 
@@ -144,12 +166,12 @@ Here is a [quick start guide](docs/quickstart.md) to get you up and running with
 
 ## Generating a Provider
 
-Providers for any API backend can be generated using StackQL tools, including [stackql/openapi-doc-util](https://github.com/stackql/openapi-doc-util).
+Providers for any API backend can be generated using StackQL tools, including [stackql/openapisaurus](https://github.com/stackql/openapisaurus).
 
 
 ## Acknowledgements
 
 This project is made possible by the following open source projects:
 - [StackQL](https://github.com/stackql/stackql)
-- [Deno Oak](https://deno.land/x/oak@v11.1.0)
+- [Oak Server](https://oakserver.org/)
 - [Deno Postgres Driver](https://github.com/denodrivers/postgres)
