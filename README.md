@@ -84,7 +84,7 @@ An example is shown here:
 curl -X POST http://localhost:8080/stackql \
      -H "Content-Type: application/json" \
      -d '{
-           "query": "SELECT COUNT(*) FROM aws.ec2.instances_list_only WHERE region = '\''ap-southeast-2'\''",
+           "query": "SELECT COUNT(*) as count FROM aws.ec2.instances_list_only WHERE region = '\''ap-southeast-2'\''",
            "params": {
              "region": "ap-southeast-2"
            },

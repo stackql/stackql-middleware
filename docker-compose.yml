@@ -42,6 +42,24 @@ services:
       retries: 3
     command: stackql --pgsrv.port=5444 srv
 
+  duckdb:
+    build:
+      context: .
+      dockerfile: duckdb.Dockerfile
+    expose:
+      - 5433
+    environment:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_REGION
+    volumes:
+      - duckdb-data:/app/data
+    healthcheck:
+      test: ["CMD", "/app/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  
   api:
     build:
       context: ./src
@@ -49,9 +67,16 @@ services:
     environment:
       DB_HOST: runner
       DB_PORT: 5444
+      DUCKDB_HOST: duckdb
+      DUCKDB_PORT: 5433
       LOGLEVEL: ${LOGLEVEL:-INFO}
     ports:
       - "8080:8080"
     depends_on:
       runner:
         condition: service_healthy
+      duckdb:
+        condition: service_healthy        
+
+volumes:
+  duckdb-data:

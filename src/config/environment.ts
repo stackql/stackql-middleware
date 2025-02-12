@@ -10,6 +10,10 @@ export const config = {
       name: 'stackql',
       user: 'stackql',
     },
+    duckdb: {
+      host: Deno.env.get('DUCKDB_HOST') || 'localhost',
+      port: Number(Deno.env.get('DUCKDB_PORT')) || 5433,
+    },    
     logging: {
       level: Deno.env.get('LOGLEVEL') || 'INFO'
     }
