@@ -9,6 +9,7 @@ import { errorHandler } from "./middleware/error.middleware.ts";
 import { healthRouter } from "./routes/health.routes.ts";
 import { queryRouter } from "./routes/query.routes.ts";
 import { metaRouter } from "./routes/meta.routes.ts";
+import { duckdbRouter } from "./routes/duckdb.routes.ts";
 
 const app = new Application<Context>();
 
@@ -28,10 +29,12 @@ app.use(errorHandler);
 app.use(healthRouter.routes());
 app.use(queryRouter.routes());
 app.use(metaRouter.routes());
+app.use(duckdbRouter.routes());
 
 app.use(healthRouter.allowedMethods());
 app.use(queryRouter.allowedMethods());
 app.use(metaRouter.allowedMethods());
+app.use(duckdbRouter.allowedMethods());
 
 app.addEventListener("error", (evt) => {
   logger.error(`Uncaught error: ${evt.error}`);
